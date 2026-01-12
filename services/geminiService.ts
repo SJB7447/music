@@ -1,7 +1,8 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { SongRecommendation, Region } from "../types";
+import { SongRecommendation } from "../types";
 
+// process.env.API_KEY는 vite.config.ts의 define 설정을 통해 주입됩니다.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getMusicRecommendations = async (theme: string): Promise<SongRecommendation[]> => {
@@ -31,7 +32,9 @@ export const getMusicRecommendations = async (theme: string): Promise<SongRecomm
   });
 
   try {
-    const data = JSON.parse(response.text || "[]");
+    const text = response.text;
+    if (!text) throw new Error("Empty response from AI");
+    const data = JSON.parse(text);
     return data;
   } catch (e) {
     console.error("Failed to parse Gemini response", e);
