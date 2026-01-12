@@ -1,15 +1,13 @@
-/// <reference types="node" />
 import { GoogleGenAI, Type } from "@google/genai";
 import { SongRecommendation } from "../types";
 
-// Vite 'define'을 통해 주입되는 전역 변수 선언
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      API_KEY: string;
-    }
-  }
-}
+// TypeScript가 빌드 시점에 process.env.API_KEY를 인식할 수 있도록 선언합니다.
+// 실제 값은 Vite의 'define' 설정을 통해 런타임에 주입됩니다.
+declare const process: {
+  env: {
+    API_KEY: string;
+  };
+};
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
