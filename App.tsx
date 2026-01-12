@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { getMusicRecommendations } from './services/geminiService';
 import { SongRecommendation } from './types';
@@ -6,13 +5,12 @@ import SongItem from './components/SongItem';
 import MoodBackground from './components/MoodBackground';
 
 const PRESET_THEMES = [
-  "활기찬 아침 출근길",
-  "비 오는 날의 창밖 풍경",
-  "편안한 퇴근 시간",
-  "한강을 지나며 듣는 노래",
-  "잠이 덜 깬 몽롱한 오전",
-  "힙한 스트릿 감성",
-  "여유로운 주말 예습"
+  { label: "활기찬 아침", icon: "☀️", value: "활기찬 아침 출근길" },
+  { label: "비 오는 날", icon: "☔", value: "비 오는 날의 창밖 풍경" },
+  { label: "퇴근길 위로", icon: "🌙", value: "편안한 퇴근 시간" },
+  { label: "한강 드라이브", icon: "🚗", value: "한강을 지나며 듣는 노래" },
+  { label: "몽환적인 밤", icon: "🌌", value: "잠이 덜 깬 몽롱한 오전" },
+  { label: "힙한 감성", icon: "🎧", value: "힙한 스트릿 감성" },
 ];
 
 const App: React.FC = () => {
@@ -38,7 +36,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchMusic(currentTheme);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,81 +53,96 @@ const App: React.FC = () => {
   const dominantMood = recommendations.length > 0 ? recommendations[0].mood : 'default';
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 md:p-8 relative">
+    <div className="min-h-screen flex flex-col items-center p-6 md:p-12 relative">
       <MoodBackground mood={dominantMood} />
 
-      {/* Header */}
-      <header className="w-full max-w-2xl text-center mb-8 pt-6">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 drop-shadow-md">
-          COMMUTE <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">BEATS</span>
+      {/* Header Container */}
+      <header className="w-full max-w-2xl flex flex-col items-center mb-12">
+        <div className="bg-white/10 px-4 py-1.5 rounded-full border border-white/20 mb-6 backdrop-blur-md">
+          <span className="text-[10px] font-black tracking-[0.3em] text-white/80 uppercase">Daily Curation</span>
+        </div>
+        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 text-center">
+          COMMUTE<br/>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 drop-shadow-sm">BEATS</span>
         </h1>
-        <p className="text-white/80 font-medium">당신의 출퇴근길을 채워줄 7곡의 데일리 믹스</p>
+        <p className="text-white/50 font-medium text-lg text-center max-w-md leading-snug">
+          오늘 당신의 여정을 채워줄 완벽한 사운드트랙 7곡을 제안합니다.
+        </p>
       </header>
 
-      {/* Theme Input */}
-      <section className="w-full max-w-2xl mb-8">
-        <form onSubmit={handleSubmit} className="relative group">
-          <input
-            type="text"
-            value={themeInput}
-            onChange={(e) => setThemeInput(e.target.value)}
-            placeholder="예: 지친 퇴근길에 위로가 되는 인디 음악"
-            className="w-full px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 text-lg placeholder:text-white/40 shadow-2xl transition-all"
-          />
-          <button 
-            type="submit"
-            className="absolute right-2 top-2 bottom-2 px-6 bg-white text-indigo-900 font-bold rounded-xl hover:bg-indigo-50 active:scale-95 transition-all shadow-lg"
-          >
-            검색
-          </button>
+      {/* Floating Search Bar */}
+      <section className="w-full max-w-2xl mb-12 z-10">
+        <form onSubmit={handleSubmit} className="relative group perspective-1000">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[2.5rem] blur opacity-25 group-focus-within:opacity-50 transition duration-1000 group-focus-within:duration-200"></div>
+          <div className="relative">
+            <input
+              type="text"
+              value={themeInput}
+              onChange={(e) => setThemeInput(e.target.value)}
+              placeholder="분위기나 상황을 입력하세요..."
+              className="w-full px-8 py-6 rounded-[2rem] bg-[#0f172a]/80 backdrop-blur-2xl border border-white/10 focus:outline-none focus:border-white/30 text-xl font-medium placeholder:text-white/20 shadow-2xl transition-all"
+            />
+            <button 
+              type="submit"
+              className="absolute right-3 top-3 bottom-3 px-8 bg-white text-black font-black rounded-3xl hover:bg-blue-50 active:scale-95 transition-all shadow-xl"
+            >
+              GO
+            </button>
+          </div>
         </form>
 
-        <div className="flex flex-wrap gap-2 mt-4 justify-center">
-          {PRESET_THEMES.map((theme) => (
+        <div className="flex flex-wrap gap-2.5 mt-8 justify-center">
+          {PRESET_THEMES.map((item) => (
             <button
-              key={theme}
+              key={item.value}
               onClick={() => {
-                setThemeInput(theme);
-                setCurrentTheme(theme);
-                fetchMusic(theme);
+                setThemeInput(item.value);
+                setCurrentTheme(item.value);
+                fetchMusic(item.value);
               }}
-              className="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition-colors"
+              className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 transition-all duration-300"
             >
-              #{theme}
+              <span className="text-sm group-hover:scale-125 transition-transform">{item.icon}</span>
+              <span className="text-xs font-bold text-white/60 group-hover:text-white">{item.label}</span>
             </button>
           ))}
         </div>
       </section>
 
-      {/* Main Content */}
-      <main className="w-full max-w-2xl flex-grow">
+      {/* Music Grid */}
+      <main className="w-full max-w-2xl flex-grow mb-20">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-6">
-            <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-            <p className="text-xl font-medium animate-pulse">오늘의 추천 곡을 고르는 중...</p>
+          <div className="flex flex-col items-center justify-center py-24 space-y-8">
+            <div className="flex gap-1.5 h-12 items-end">
+              {[0, 1, 2, 3, 4].map(i => (
+                <div key={i} className="w-2 bg-white rounded-full animate-bounce" style={{animationDelay: `${i * 0.1}s`, height: `${30 + (i % 2) * 40}%`}}></div>
+              ))}
+            </div>
+            <p className="text-xl font-bold tracking-tight text-white/60 animate-pulse uppercase">Curating your playlist...</p>
           </div>
         ) : error ? (
-          <div className="bg-red-500/20 backdrop-blur-md border border-red-500/50 p-6 rounded-2xl text-center">
-            <p className="text-lg mb-4">{error}</p>
+          <div className="bg-red-500/10 backdrop-blur-2xl border border-red-500/30 p-10 rounded-[2.5rem] text-center shadow-2xl">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-lg font-bold text-red-200 mb-6">{error}</p>
             <button 
               onClick={handleRefresh}
-              className="px-6 py-2 bg-white text-red-600 font-bold rounded-lg"
+              className="px-8 py-3 bg-white text-black font-black rounded-2xl hover:bg-red-50 transition-colors"
             >
-              다시 시도하기
+              RETRY
             </button>
           </div>
         ) : (
-          <div className="space-y-4 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex justify-between items-end mb-4 px-2">
-              <h2 className="text-xl font-bold">
-                <span className="text-yellow-400">"{currentTheme}"</span> 에 어울리는 선곡
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+            <div className="flex justify-between items-center mb-6 px-4">
+              <h2 className="text-2xl font-black">
+                <span className="text-white/40 font-light">Now: </span>
+                <span>{currentTheme}</span>
               </h2>
               <button 
                 onClick={handleRefresh}
-                className="flex items-center gap-2 text-sm font-semibold text-white/70 hover:text-white transition-colors group"
+                className="p-3 bg-white/5 rounded-full border border-white/10 hover:bg-white/10 hover:rotate-180 transition-all duration-500 group"
               >
-                <svg className="w-4 h-4 group-active:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                새로운 추천 받기
+                <svg className="w-5 h-5 text-white/60 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
               </button>
             </div>
             {recommendations.map((song, idx) => (
@@ -140,19 +152,21 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Footer Info */}
-      <footer className="w-full text-center py-8 text-white/40 text-xs">
-        <p>© 2024 Commute Beats. Powered by Gemini API.</p>
-        <p className="mt-1">곡 제목을 클릭하면 유튜브 검색으로 연결됩니다.</p>
+      <footer className="w-full text-center py-12 border-t border-white/5 mt-auto">
+        <p className="text-white/20 font-black tracking-widest text-[10px] uppercase mb-2">Developed with Gemini AI</p>
+        <p className="text-white/40 text-xs font-medium">© 2024 COMMUTE BEATS. CLICK TRACKS TO PLAY ON YOUTUBE.</p>
       </footer>
       
-      {/* Persistent Refresh Button for Mobile UX */}
+      {/* Scroll to Top / Refresh FAB */}
       {!isLoading && recommendations.length > 0 && (
         <button 
-          onClick={handleRefresh}
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-white text-indigo-900 shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all z-20 md:hidden"
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(handleRefresh, 500);
+          }}
+          className="fixed bottom-8 right-8 w-16 h-16 rounded-[2rem] bg-white text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-30"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
       )}
     </div>
