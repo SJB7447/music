@@ -1,12 +1,15 @@
+/// <reference types="node" />
 import { GoogleGenAI, Type } from "@google/genai";
 import { SongRecommendation } from "../types";
 
-// Vite의 'define' 설정을 통해 주입되는 process.env.API_KEY에 대한 타입 안정성 확보
-declare var process: {
-  env: {
-    API_KEY: string;
-  };
-};
+// Vite 'define'을 통해 주입되는 전역 변수 선언
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      API_KEY: string;
+    }
+  }
+}
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
