@@ -1,8 +1,13 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { SongRecommendation } from "../types";
 
-// process.env.API_KEY는 vite.config.ts의 define 설정을 통해 주입됩니다.
+// Vite의 'define' 설정을 통해 주입되는 process.env.API_KEY에 대한 타입 안정성 확보
+declare var process: {
+  env: {
+    API_KEY: string;
+  };
+};
+
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getMusicRecommendations = async (theme: string): Promise<SongRecommendation[]> => {
